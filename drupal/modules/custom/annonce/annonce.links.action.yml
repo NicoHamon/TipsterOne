@@ -1,0 +1,7 @@
+entity.annonce.add_form:
+  route_name: entity.annonce.add_form
+  title: 'Ajouter un pronostique'
+  appears_on:
+    - entity.annonce.collection
+    - entity.annonce.collection.admin
+

@@ -1,0 +1,5 @@
+tipster.action:
+  route_name:
+  title: 'Devenir tipster!'
+  appears_on:
+    -

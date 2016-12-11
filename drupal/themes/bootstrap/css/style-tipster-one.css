@@ -1,0 +1,440 @@
+/*
+COULEURS
+VERT CLAIR : 00cc26
+VERT FONCé : 024a07
+*/
+
+body {
+  margin-top: 0;
+}
+/*
+LIENS
+*/
+a {
+  color:#00cc26;
+}
+a:hover, a:focus{
+  color:#024a07;
+}
+
+/*
+HEADER
+*/
+.navbar-default {
+  background:none;
+  border: none;
+}
+.page-header {
+  border-bottom: none;
+  margin: 0;
+}
+header.container {
+  padding: 0;
+}
+header .navbar-header {
+  width: 100%;
+}
+.view-ml-jouer-comporte-des-risques img {
+  width: 579px;
+  margin: 0 auto;
+}
+.breadcrumb {
+  background:none;
+}
+.region-header .tabs .nav-tabs {
+    border-bottom: none;
+}
+.region-header .tabs .nav-tabs > li > a {
+  border-radius: 4px;
+}
+.region-header .tabs .nav-tabs > li.active > a {
+  border: none;
+}
+.region-header .tabs .nav-tabs > li > a:hover,
+.region-header .tabs .nav-tabs > li > a:focus {
+  border: 1px solid #024a07;
+}
+.navbar-default .nav > li > a {
+  color: #024a07;
+  border: 1px solid #024a07;
+  border-radius: 4px;
+  margin: 0 5px;
+  padding: 5px;
+}
+.navbar-default .nav li{
+      float: left;
+}
+.navbar-default .nav > .active > a,
+.navbar-default .nav > .active > a:hover,
+.navbar-default .nav > .active > a:focus,
+.navbar-default .nav > .active > a:visited,
+.navbar-default .nav > li > a:hover,
+.navbar-default .nav > li > a:focus,
+.navbar-default .nav > .active > a:visited {
+  border: 1px solid #024a07;
+  border-radius: 4px;
+  color: #024a07;
+  background: none;
+  background-color: #00cc26;
+}
+
+.navbar-default .navbar-collapse {
+    margin-top: 120px;
+    padding: 0;
+}
+
+.navbar-default .navbar-brand {
+    color: #024a07;
+    text-transform: uppercase;
+    font-size: 30px;
+    padding: 80px 0 0 0;
+}
+
+#block-menucomptetipster ul.nav,
+#block-menucomptefollower  ul.nav,
+#block-menucomptenonauthentifie ul.nav {
+    float: right;
+}
+#block-menunavigationtipster ul.nav,
+#block-menunavigationfollower ul.nav,
+#block-menunavigationnonauthentifie ul.nav {float:left;}
+/*
+TYPO
+*/
+body {
+    font-family: Calibri, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+h1, .h1,
+h2, .h2 {
+  color: #024a07;
+}
+h2, .h2 {
+    font-size: 20px;
+}
+h1, .h1 {
+    font-size: 30px;
+}
+
+.form-item h4.label {
+  padding: 0;
+  font-weight: normal;
+  color: black;
+  font-size:100%;
+}
+.field--name-user-picture {
+  display: none;
+}
+.path-user .field--name-user-picture {
+  display: block;
+}
+.path-user .region-sidebar-second .field--name-user-picture {
+  display: none;
+}
+
+/*
+PICTO FLAG
+
+
+.action-unflag {
+  background:url(../img/picto-follow-on.png) no-repeat top left transparent;
+  padding: 8px 0px 3px 35px;
+}
+.action-flag {
+  background:url(../img/picto-follow-off.png) no-repeat top left transparent;
+  padding: 8px 0px 3px 35px;
+
+}
+*/
+
+/*
+SIDE BAR RIGHT
+*/
+.view-derniers-utilisateurs-inscrits .views-field-login span.field-content {
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+.view-derniers-pronostiques .views-field-uid {
+    margin-bottom: 10px;
+}
+.view-derniers-pronostiques .views-field-title {
+  font-weight: bold;
+}
+.view-derniers-pronostiques .views-label-field-cote {
+  float: left;
+}
+.view-tipster-de-la-semaine .views-label {
+  float: left;
+}
+.view-tipster-de-la-semaine .field-content {
+  float: right;
+  color: #024a07;
+  font-weight:bold;
+}
+.view-tipster-de-la-semaine .views-field-name .field-content {
+  float: left;
+}
+.view-tipster-de-la-semaine .views-field {
+  clear: both;
+}
+/*
+PRONOSTIQUE
+*/
+article.pronostique .field--label-above .field--label,
+.view-id-infos_follower .views-label,
+.view-id-test_profil .field--label,
+.view-id-test_profil .views-label {
+  color:#024a07;
+  padding:5px;
+  width:25%;
+  float:left;
+  border-bottom:1px solid #024a07;
+    font-weight: normal;
+}
+article.pronostique .field--label-above .field--item,
+.view-id-infos_follower .field-content,
+.view-id-test_profil .field--item,
+.view-id-test_profil .field-content {
+  font-weight:bold;
+  color:#00cc26;
+  padding:5px;
+  width:25%;
+  float:left;
+  border-bottom:1px solid #024a07;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+article.pronostique .field--name-field-analyse .field--item:hover {
+  overflow: none;
+  text-overflow: none;
+  white-space: none;
+}
+
+article.pronostique .field--name-field-analyse {
+  clear:both;
+}
+
+article.pronostique .field--name-field-analyse .field--item {
+  white-space: normal;
+  width: 600px;
+  border-bottom: none;
+  font-weight: normal;
+  color: black;
+}
+.views-field-field-sport h2,
+.field--name-field-sport h2 a{
+  display: none;
+}
+.views-field-field-sport .field--name-field-picto-ball {
+  display: block;
+}
+.field--name-field-sport .field--name-field-picto-ball {
+  border-bottom: none !important;
+}
+/*
+SLIDESHOW
+*/
+.views-slideshow-controls-bottom {
+  height: 32px;
+  margin: 10px 0;
+}
+#views_slideshow_controls_text_slideshow-block_1 {
+  float: left;
+}
+#views_slideshow_slide_counter_slideshow-block_1 {
+  float: right;
+}
+#views_slideshow_controls_text_next_slideshow-block_1 a {
+    background: url(../img/fast-forward.png) no-repeat top left transparent;
+    color: transparent;
+    width: 32px;
+    padding-bottom: 15px;
+}
+#views_slideshow_controls_text_previous_slideshow-block_1 a {
+    background: url(../img/rewind.png) no-repeat top left transparent;
+    color: transparent;
+    width: 32px;
+    padding-bottom: 15px;
+    margin-right: -15px;
+}
+#views_slideshow_controls_text_pause_slideshow-block_1 a {
+    background: url(../img/skip.png) no-repeat top left transparent;
+    color: transparent;
+    width: 32px;
+    padding-bottom: 15px;
+}
+#views_slideshow_controls_text_next_slideshow-block_1 a:hover,
+#views_slideshow_controls_text_next_slideshow-block_1 a:focus
+ {
+    background: url(../img/fast-forward-on.png) no-repeat top left transparent;
+}
+#views_slideshow_controls_text_previous_slideshow-block_1 a:hover,
+#views_slideshow_controls_text_previous_slideshow-block_1 a:focus
+ {
+    background: url(../img/rewind-on.png) no-repeat top left transparent;
+}
+#views_slideshow_controls_text_pause_slideshow-block_1 a:hover,
+#views_slideshow_controls_text_pause_slideshow-block_1 a:focus
+ {
+    background: url(../img/skip-on.png) no-repeat top left transparent;
+}
+#views_slideshow_cycle_main_slideshow-block_1 .img-responsive {
+  -moz-border-radius: 9px;
+  -webkit-border-radius: 9px;
+  border-radius: 9px;
+  border: 3px solid #024a07;
+  max-width: 100%;
+}
+
+/*
+FORMULAIRE
+*/
+.annonce-form label {
+  color:#024a07;
+}
+
+.form-inline .form-control {
+    display: block;
+    width: 100%;
+}
+
+/*
+BOUTONS BOOTSTRAP
+*/
+.btn-primary {
+  background-color: #00cc26;
+  border-color: #024a07;
+}
+.btn-primary:focus, .btn-primary.focus,
+.btn-primary:active, .btn-primary.active,
+.btn-primary:hover {
+  background-color: #024a07;
+  border-color: #024a07;
+}
+.nav > li > a:hover, .nav > li > a:focus {
+  background: none;
+}
+
+/*
+REGIONS
+*/
+aside .well {
+  padding: 0;
+  border: 0;
+  background: 0;
+}
+
+.region-sidebar-first section,
+.region-sidebar-second section{
+  border:solid 3px #024a07;
+  -moz-border-radius: 9px;
+  -webkit-border-radius: 9px;
+  border-radius: 9px;
+  -moz-box-shadow:inset 0px 15px 0px #00cc26;
+  -webkit-box-shadow:inset 0px 15px 0px #00cc26;
+  box-shadow:inset 0px 15px 0px #00cc26;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+}
+
+/*
+ARTICLE
+*/
+article img {
+  max-width: 100%;
+}
+.views-element-container .view-frontpage .views-row article,
+.views-element-container .view-actualites .views-row article,
+.views-element-container .view-mes-analyses .views-row article {
+  border: solid 3px #024a07;
+  -moz-border-radius: 9px;
+  -webkit-border-radius: 9px;
+  border-radius: 9px;
+  -moz-box-shadow: inset 0px 15px 0px #00cc26;
+  -webkit-box-shadow: inset 0px 15px 0px #00cc26;
+  box-shadow: inset 0px 15px 0px #00cc26;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+}
+.views-element-container .view-frontpage .views-row article article,
+.views-element-container .view-actualites .views-row article article,
+.views-element-container .view-mes-analyses .views-row article article {
+  display: none;
+}
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover,
+.pagination > .active > a:focus,
+.pagination > .active > span:focus {
+    background-color: #00cc26;
+    border-color: #024a07;
+}
+.pagination > li > a, .pagination > li > span {
+  border-color: #024a07;
+  color: #024a07;
+}
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
+    color: white;
+    background-color: #00cc26;
+    border-color: #024a07;
+}
+/*
+FOOTER
+*/
+.footer {
+  border-top: 1px solid #024a07;
+}
+
+/*
+HACK CSS BUG AFFICHAGE TIPSTER FOLLOWER
+*/
+.views-element-container.form-group .view-display-id-user_view{
+  display: none;
+}
+/*
+HACK CSS EFFACER MEMBRE DEPUIS ETC ... SUR PROFILE
+*/
+.path-user .region-content .js-form-type-item {
+  display: none;
+  margin-bottom: 0;
+}
+
+/*
+BTN PRONO FULL
+*/
+.pronostique .full .btn{ 
+  margin-top: 20px;
+  float: right;
+}
+
+
+
+
+
+
+
+/*
+MEDIA QUERIES
+*/
+@media screen and (max-width: 1200px) {
+  header .navbar-header .region-navigation .navbar-brand {
+    display:none;
+  }
+}
+
+
+/*
+BORDER BOTTOM BALL
+*/
+.page-node-type-pronostique .pronostique .field--name-field-sport .field--name-field-picto-ball .field--item {
+border-bottom: none;
+}

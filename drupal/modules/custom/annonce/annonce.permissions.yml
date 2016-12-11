@@ -1,0 +1,24 @@
+permission_view_annonce:
+  title: 'view pronostique entity'
+  description: 'view pronostique entity'
+  restrict access: 'true'
+
+permission_add_annonce:
+  title: 'add pronostique entity'
+  description: 'add pronostique entity'
+  restrict access: 'true'
+
+permission_edit_annonce:
+  title: 'edit pronostique entity'
+  description: 'edit pronostique entity'
+  restrict access: 'true'
+
+permission_delete_annonce:
+  title: 'delete pronostique entity'
+  description: 'delete pronostique entity'
+  restrict access: 'true'
+
+permission_admin_annonce:
+  title: 'administer pronostique entity'
+  description: 'administer pronostique entity'
+  restrict access: 'true'

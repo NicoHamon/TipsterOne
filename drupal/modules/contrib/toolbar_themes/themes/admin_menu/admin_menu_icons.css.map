@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": ";;;AAoBE,qCAAc;EACZ,OAAO,EAAE,WAAW;AAQhB,2FAAc;EACZ,IAAI,ECfsB,OAAO;EDgBjC,GAAG,EAAE,KAAK;AAGZ,gGAAmB;EACjB,KAAK,EAAE,OAAO;AAQZ;;;4GAAc;EACZ,IAAI,EC5BkB,IAAI;ADoCtC,wCAAyC;EAGvC;;gFAEuD;IACrD,OAAO,EAAE,IAAI;AAOf,uCAAE;EACA,IAAI,ECpC0B,OAAW;EDsCzC,+LAGY;IACV,IAAI,ECrDwB,IAAI;EDwDlC,2DAAsB;IACpB,IAAI,EC9CwB,OAAW;EDoDvC,0KAAY;IACV,IAAI,EChEsB,IAAI",
+"sources": ["admin_menu_icons.scss","_variables.scss"],
+"names": [],
+"file": "admin_menu_icons.css"
+}

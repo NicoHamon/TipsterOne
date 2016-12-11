@@ -1,0 +1,11 @@
+entity.annonce.collection:
+  title: 'pronostique: Listing'
+  route_name: entity.annonce.collection
+  description: 'Liste des pronostiques'
+
+annonce.admin.structure.settings:
+  title: pronostique Settings
+  description: 'Configure pronostique entity'
+  route_name:  annonce.settings
+  parent: system.admin_structure
+

@@ -1,0 +1,21 @@
+
+routing :
+
+annonce.historique:
+  path: '/admin/structure/annonce/historique-des-annonces'
+  defaults:
+    _title: 'Historique des pronostiques'
+  requirements:
+    _entity_access: 'annonce.view'
+
+
+_____________________________________________________________________
+
+
+links task :
+
+annonce.historique:
+  route_name: view.historique-des-annonces.page_1
+  base_route: annonce.settings
+  title: 'Historique des pronostiques'
+  weight: 10

@@ -1,0 +1,472 @@
+<?php
+
+/**
+ * @file
+ * Contains tipster.module..
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\profile\Entity\Profile;
+use Drupal\profile\Entity\ProfileType;
+use Drupal\field\FieldConfigInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\Core\Field\EntityReferenceFieldItemList;
+/**
+ * Implements hook_help().
+ */
+
+
+function tipster_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the tipster module.
+    case 'help.page.tipster':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('tipster module') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add available profile forms to the user registration form.
+ */
+
+
+function tipster_form_user_register_form_alter(&$form, Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+{
+
+    $form['account']['name']['#title']= t('Pseudo');
+}
+
+
+function tipster_user_presave(Drupal\Core\Entity\EntityInterface $entity) {
+
+    $role= $entity->get('field_role')->getValue();
+    $role_value=$role[0]['target_id'];
+    if(!empty($role)) {
+        if ($role_value == 'tipster') {
+            $entity->addRole('tipster');
+        }elseif ($role_value == 'follower') {
+            $entity->addRole('follower');
+        }
+    }
+}
+
+
+function tipster_form_profile_tipster_add_form_alter(&$form, FormStateInterface $form_state) {
+
+    $form['field_bankroll_actuelle']['#type']= 'hidden';
+    $form['field_roi']['#type']= 'hidden';
+    $form['field_total_des_mises']['#type']= 'hidden';
+    $form['field__de_reussite']['#type']= 'hidden';
+    $form['field_cote_moyenne']['#type']= 'hidden';
+    $form['field_bets_valides']['#type']= 'hidden';
+    $form['field_bets_non_valides']['#type']= 'hidden';
+    $form['field_bets_annules']['#type']= 'hidden';
+
+}
+function tipster_form_profile_follower_add_form_alter(&$form, FormStateInterface $form_state) {
+
+    $form['field_bankroll_actuelle']['#type']= 'hidden';
+    $form['field_roi']['#type']= 'hidden';
+    $form['field_total_des_mises']['#type']= 'hidden';
+    $form['field__de_reussite']['#type']= 'hidden';
+    $form['field_cote_moyenne']['#type']= 'hidden';
+    $form['field_bets_valides']['#type']= 'hidden';
+    $form['field_bets_non_valides']['#type']= 'hidden';
+    $form['field_bets_annules']['#type']= 'hidden';
+}
+
+
+function tipster_profile_presave(Drupal\Core\Entity\EntityInterface $entity) {
+    if($entity->isNew()){
+     $BkDepart=$entity->get('field_bankroll_de_depart')->value;
+        $entity->set('field_bankroll_actuelle',$BkDepart);
+     }
+}
+
+
+function tipster_form_node_pronostique_form_alter(&$form, FormStateInterface $form_state) {
+
+    $form['field_etat']['#type']= 'hidden';
+    $form['field_resultat']['#disabled']= 'true';
+    $form['field_etat']['#type']= 'hidden';
+
+}
+
+
+function tipster_form_node_pronostique_edit_form_alter(&$form, FormStateInterface $form_state) {
+
+    $form['field_etat']['#type']= 'hidden';
+    $form['field_mon_prono']['#disabled']= 'true';
+    $form['field_cote']['#disabled']= 'true';
+    $prono_id = explode(":", $form['#cache']['tags'][1]);
+
+    $storage_prono = \Drupal::entityTypeManager()->getStorage('node');
+    $pronos = $storage_prono->loadMultiple($prono_id);
+    foreach ($pronos as $prono) {
+        $date_prono = $prono->get('field_date_et_heure')->value;
+    }
+    $now = time();
+    $resultat = $form_state->getValue('field_resultat');
+    if ((($date_prono - $now) <= '0') OR ($resultat != 'En attente'))
+{
+
+        $form['title']['#disabled']= 'true';
+        $form['field_sport']['#disabled']= 'true';
+        $form['field_competition']['#disabled']= 'true';
+        $form['field_cote']['#disabled']= 'true';
+        $form['field_date_et_heure']['#disabled']= 'true';
+        $form['field_cote']['#disabled']= 'true';
+        $form['field_date_et_heure']['#disabled']= 'true';
+        $form['field_type']['#disabled']= 'true';
+        $form['field_mon_prono']['#disabled']= 'true';
+        $form['field_opposant_1']['#disabled']= 'true';
+        $form['field_opposant_deux']['#disabled']= 'true';
+
+    }
+
+}
+
+
+function tipster_node_presave(Drupal\Core\Entity\EntityInterface $entity)
+{
+    if( $entity->bundle() =='pronostique') {
+        /*on récupère la valeur des champs résultat et état*/
+        $etat_prono=$entity->get('field_etat')->value;
+        $resultat= $entity->get('field_resultat')->getValue();
+
+        /* On récupère la valeur des champs numériques pour le calcul de la BK*/
+        $cote_prono=$entity->get('field_cote')->value;
+        $id_prono=$entity->id();
+
+        $current_user = \Drupal:: currentUser();
+        $tab_role = $current_user->getRoles();
+
+/*Si le prono est créé, on met à jour le BK de l'auteur*/
+        if( $entity->isNew()) {
+            $current_user = \Drupal:: currentUser();
+
+            $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+            $query = \Drupal::entityQuery('profile')
+                ->condition('uid', $current_user->id(), '=');
+            $id_profile = $query->execute();
+            $profiles = $storage_profile->loadMultiple($id_profile);
+            foreach ($profiles as $profile) {
+                $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                $valeur_unite = $profile->get('field_valeur_unite')->value;
+                $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+                $mise = $valeur_unite * $bankroll_depart / 100;
+                $bankroll_actuelle = ($bankroll_actuelle - $mise);
+                $total_des_mises = $total_des_mises + $mise;
+
+                $profile->set('field_total_des_mises', $total_des_mises);
+                $profile->set('field_bankroll_actuelle', $bankroll_actuelle);
+
+                $profile->save();
+            }
+        }
+
+/*Si le prono passe de 'En attente(28)' à 'gagné(29)' ou 'perdu(30)' pour la première fois*/
+        if( ($resultat[0]['target_id'] !=='28') and ($etat_prono == 'En attente'))
+        {
+            switch ($resultat[0]['target_id']){
+////////////////////*Le prono est gagné*/
+                case '29':  $entity->set('field_etat','Gagné');
+                     /*Mise à jour dela BK pour l'auteur*/
+
+                        $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+                        $query = \Drupal::entityQuery('profile')
+                            ->condition('uid', $current_user->id(), '=');
+                        $id_profile = $query->execute();
+                        $profiles = $storage_profile->loadMultiple($id_profile);
+                        foreach ($profiles as $profile) {
+                            $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                            $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                            $bet_valides = $profile->get('field_bets_valides')->value;
+                            $bet_non_valides = $profile->get('field_bets_non_valides')->value;
+                            $cote_moyenne = $profile->get('field_cote_moyenne')->value;
+                            $total_des_mises = $profile->get('field_total_des_mises')->value;
+                            $valeur_unite = $profile->get('field_valeur_unite')->value;
+
+                            /*Calcul des éléments de BK*/
+                            $mise = $valeur_unite * $bankroll_depart / 100;
+                            $bankroll_actuelle = $bankroll_actuelle + $mise* $cote_prono;
+                            $bet_valides = $bet_valides + 1;
+                            $bet_total = $bet_valides + $bet_non_valides;
+                            $tx_reussite = round(($bet_valides / $bet_total) * 100, 2);
+                            $cote_moyenne = ($cote_moyenne * ($bet_total - 1) + $cote_prono) / $bet_total;
+                            $roi = round((($bankroll_actuelle - $bankroll_depart) / $total_des_mises) * 100, 2);
+
+                            $profile->set('field_bankroll_actuelle', $bankroll_actuelle);
+                            $profile->set('field__de_reussite', $tx_reussite);
+                            $profile->set('field_bets_valides', $bet_valides);
+                            $profile->set('field_cote_moyenne', $cote_moyenne);
+                            $profile->set('field_roi', $roi);
+
+                            $profile->save();
+                        }
+
+                    /* Si l'auteur est un tipster (le follower n'aura pas de flags sur son prono)*/
+                    if(in_array('tipster',$tab_role)) {
+                        $storage_flaggin = \Drupal::entityTypeManager()->getStorage('flagging');
+                        $query = \Drupal::entityQuery('flagging')
+                            ->condition('flag_id', 'suivre_un_prono', '=')
+                            ->condition('entity_id', $id_prono, '=');
+                        $ids_flaggin = $query->execute();
+                        $flaggins = $storage_flaggin->loadMultiple($ids_flaggin);
+                        /*!!!!!!!!!!!!!!if not empty$flaggins !!!!!!!!!!!!!!!!!!*/
+                        foreach ($flaggins as $flaggin) {
+                            $id_better = $flaggin->getOwnerId();
+
+                            $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+                            $query = \Drupal::entityQuery('profile')
+                                ->condition('uid', $id_better, '=');
+                            $id_profile = $query->execute();
+                            $profiles = $storage_profile->loadMultiple($id_profile);
+                            foreach ($profiles as $profile) {
+                                $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                                $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                                $bet_valides = $profile->get('field_bets_valides')->value;
+                                $bet_non_valides = $profile->get('field_bets_non_valides')->value;
+                                $cote_moyenne = $profile->get('field_cote_moyenne')->value;
+                                $total_des_mises = $profile->get('field_total_des_mises')->value;
+                                $valeur_unite = $profile->get('field_valeur_unite')->value;
+
+                                /*Calcul des éléments de BK*/
+                                $mise = $valeur_unite * $bankroll_depart / 100;
+                                $bankroll_actuelle = $bankroll_actuelle + $mise* $cote_prono;
+                                $bet_valides = $bet_valides + 1;
+                                $bet_total = $bet_valides + $bet_non_valides;
+                                $tx_reussite = round(($bet_valides / $bet_total) * 100, 2);
+                                $cote_moyenne = ($cote_moyenne * ($bet_total - 1) + $cote_prono) / $bet_total;
+                                $roi = round((($bankroll_actuelle - $bankroll_depart) / $total_des_mises) * 100, 2);
+
+                                $profile->set('field_bankroll_actuelle', $bankroll_actuelle);
+                                $profile->set('field_roi', $roi);
+                                $profile->set('field__de_reussite', $tx_reussite);
+                                $profile->set('field_bets_valides', $bet_valides);
+                                $profile->set('field_cote_moyenne', $cote_moyenne);
+
+                                $profile->save();
+                            }
+                        }
+                    }
+                    break;
+
+////////////////////////*Le prono est perdu*/
+                case '30':  $entity->set('field_etat','Perdu');
+                    /*Mise à jour dela BK pour l'auteur*/
+
+                    $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+                    $query = \Drupal::entityQuery('profile')
+                        ->condition('uid', $current_user->id(), '=');
+                    $id_profile = $query->execute();
+                    $profiles = $storage_profile->loadMultiple($id_profile);
+                    foreach ($profiles as $profile) {
+                        $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                        $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                        $bet_valides = $profile->get('field_bets_valides')->value;
+                        $bet_non_valides = $profile->get('field_bets_non_valides')->value;
+                        $cote_moyenne = $profile->get('field_cote_moyenne')->value;
+                        $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+                        /*Calcul des éléments de BK*/
+                        $bet_non_valides = $bet_non_valides + 1;
+                        $bet_total = $bet_valides + $bet_non_valides;
+                        $tx_reussite = round(($bet_valides / $bet_total) * 100, 2);
+                        $cote_moyenne = ($cote_moyenne * ($bet_total - 1) + $cote_prono) / $bet_total;
+                        $roi = round((($bankroll_actuelle - $bankroll_depart) / $total_des_mises) * 100, 2);
+
+                        $profile->set('field_roi', $roi);
+                        $profile->set('field__de_reussite', $tx_reussite);
+                        $profile->set('field_bets_non_valides', $bet_non_valides);
+                        $profile->set('field_cote_moyenne', $cote_moyenne);
+
+                        $profile->save();
+                        //kint($profile);
+                    }
+
+                    /* Si l'auteur est un tipster (le follower n'aura pas de flags sur son prono)*/
+                    if(in_array('tipster',$tab_role)) {
+                        $storage_flaggin = \Drupal::entityTypeManager()->getStorage('flagging');
+                        $query = \Drupal::entityQuery('flagging')
+                            ->condition('flag_id', 'suivre_un_prono', '=')
+                            ->condition('entity_id', $id_prono, '=');
+                        $ids_flaggin = $query->execute();
+                        $flaggins = $storage_flaggin->loadMultiple($ids_flaggin);
+                        foreach ($flaggins as $flaggin) {
+                            $id_better = $flaggin->getOwnerId();
+
+                            $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+                            $query = \Drupal::entityQuery('profile')
+                                ->condition('uid', $id_better, '=');
+                            $id_profile = $query->execute();
+                            $profiles = $storage_profile->loadMultiple($id_profile);
+                            foreach ($profiles as $profile) {
+                                echo 'profile';
+                                $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                                $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                                $bet_valides = $profile->get('field_bets_valides')->value;
+                                $bet_non_valides = $profile->get('field_bets_non_valides')->value;
+                                $cote_moyenne = $profile->get('field_cote_moyenne')->value;
+                                $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+                                /*Calcul des éléments de BK*/
+                                $bet_non_valides = $bet_non_valides + 1;
+                                $bet_total = $bet_valides + $bet_non_valides;
+                                $tx_reussite = round(($bet_valides / $bet_total) * 100, 2);
+                                $cote_moyenne = ($cote_moyenne * ($bet_total - 1) + $cote_prono) / $bet_total;
+                                $roi = round((($bankroll_actuelle - $bankroll_depart) / $total_des_mises) * 100, 2);
+
+                                $profile->set('field_roi', $roi);
+                                $profile->set('field__de_reussite', $tx_reussite);
+                                $profile->set('field_bets_non_valides', $bet_non_valides);
+                                $profile->set('field_cote_moyenne', $cote_moyenne);
+
+                                $profile->save();
+                            }
+                        }
+                    }
+                    break;
+
+////////////////////////*Le prono est annulé*/
+                case '31':  $entity->set('field_etat','Annulé');
+                    /*Mise à jour dela BK pour l'auteur*/
+
+                    $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+                    $query = \Drupal::entityQuery('profile')
+                        ->condition('uid', $current_user->id(), '=');
+                    $id_profile = $query->execute();
+                    $profiles = $storage_profile->loadMultiple($id_profile);
+                    foreach ($profiles as $profile) {
+                        $bet_annules = $profile->get('field_bets_annules')->value;
+                        $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                        $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                        $valeur_unite = $profile->get('field_valeur_unite')->value;
+                        $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+                        /*Calcul des éléments de BK*/
+                        $bet_annules = $bet_annules + 1;
+                        $mise = $valeur_unite * $bankroll_depart / 100;
+                        $total_des_mises = $total_des_mises - $mise;
+                        $bankroll_actuelle = $bankroll_actuelle + $mise;
+
+                        $profile->set('field_total_des_mises', $total_des_mises);
+                        $profile->set('field_bets_annules',$bet_annules);
+                        $profile->set('field_bankroll_actuelle',$bankroll_actuelle);
+
+                        $profile->save();
+                    }
+
+                    /* Si l'auteur est un tipster (le follower n'aura pas de flags sur son prono)*/
+                    if(in_array('tipster',$tab_role)) {
+                        $storage_flaggin = \Drupal::entityTypeManager()->getStorage('flagging');
+                        $query = \Drupal::entityQuery('flagging')
+                            ->condition('flag_id','suivre_un_prono','=')
+                            ->condition('entity_id',$id_prono,'=');
+                        $ids_flaggin=$query->execute();
+                        $flaggins = $storage_flaggin->loadMultiple($ids_flaggin);
+
+                        foreach ($flaggins as $flaggin){
+                            $id_better=$flaggin->getOwnerId();
+
+                            $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+                            $query = \Drupal::entityQuery('profile')
+                                ->condition('uid',$id_better,'=');
+                            $id_profile=$query->execute();
+                            $profiles = $storage_profile->loadMultiple($id_profile);
+                            foreach ($profiles as $profile){
+                                $bet_annules = $profile->get('field_bets_annules')->value;
+                                $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+                                $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+                                $valeur_unite = $profile->get('field_valeur_unite')->value;
+                                $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+                                /*Calcul des éléments de BK*/
+                                $bet_annules = $bet_annules + 1;
+                                $mise = $valeur_unite * $bankroll_depart / 100;
+                                $total_des_mises = $total_des_mises - $mise;
+                                $bankroll_actuelle = $bankroll_actuelle + $mise;
+
+                                $profile->set('field_total_des_mises', $total_des_mises);
+                                $profile->set('field_bets_annules',$bet_annules);
+                                $profile->set('field_bankroll_actuelle',$bankroll_actuelle);
+
+                                $profile->save();
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+function tipster_flagging_insert(\Drupal\Core\Entity\EntityInterface $entity) {
+    if( $entity->bundle() =='suivre_un_prono') {
+        $current_user = \Drupal:: currentUser();
+
+        $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+        //kint($storage_profile);
+        $query = \Drupal::entityQuery('profile')
+            ->condition('uid', $current_user->id(), '=');
+        $id_profile = $query->execute();
+        $profiles = $storage_profile->loadMultiple($id_profile);
+//        kint($profile);
+//        die();
+        foreach ($profiles as $profile) {
+            $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+            $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+            $valeur_unite = $profile->get('field_valeur_unite')->value;
+            $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+            $mise = $valeur_unite * $bankroll_depart / 100;
+            $bankroll_actuelle = ($bankroll_actuelle - $mise);
+            $total_des_mises = $total_des_mises + $mise;
+
+            $profile->set('field_total_des_mises', $total_des_mises);
+            $profile->set('field_bankroll_actuelle', $bankroll_actuelle);
+
+            $profile->save();
+        }
+    }
+    //kint($entity);
+}
+
+function tipster_flagging_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+    if( $entity->bundle() =='suivre_un_prono'){
+        $current_user = \Drupal:: currentUser();
+
+        $storage_profile = \Drupal::entityTypeManager()->getStorage('profile');
+        $query = \Drupal::entityQuery('profile')
+            ->condition('uid', $current_user->id(), '=');
+        $id_profile = $query->execute();
+        $profiles = $storage_profile->loadMultiple($id_profile);
+        foreach ($profiles as $profile) {
+            $bankroll_actuelle = $profile->get('field_bankroll_actuelle')->value;
+            $bankroll_depart = $profile->get('field_bankroll_de_depart')->value;
+            $valeur_unite = $profile->get('field_valeur_unite')->value;
+            $total_des_mises = $profile->get('field_total_des_mises')->value;
+
+            $mise = $valeur_unite * $bankroll_depart / 100;
+            $bankroll_actuelle = ($bankroll_actuelle + $mise);
+            $total_des_mises = $total_des_mises - $mise;
+
+            $profile->set('field_total_des_mises', $total_des_mises);
+            $profile->set('field_bankroll_actuelle', $bankroll_actuelle);
+
+            $profile->save();
+        }
+    }
+    //kint($entity);
+}

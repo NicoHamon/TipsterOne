@@ -1,0 +1,20 @@
+// Default variables.
+@import "default-variables";
+
+// Bootstrap Framework.
+@import '../bootstrap/assets/stylesheets/bootstrap';
+
+// Base-theme overrides.
+@import 'overrides';
+
+// Styles du site
+@import 'styles-tipster-one';
+
+
+.logo img {
+  border:1px solid green !important;
+}
+
+a {
+  color: green !important;
+}
